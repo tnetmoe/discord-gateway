@@ -1,0 +1,36 @@
+# https://containers.dev/guide/dockerfile
+version: '3.8'
+
+networks:
+  devcontainer:
+
+volumes:
+  rabbitmq-data:
+
+services:
+  devcontainer:
+    image: mcr.microsoft.com/devcontainers/rust:1-1-bookworm
+    command: sleep infinity
+    volumes:
+      - ../../:/workspace:cached
+    networks:
+      - devcontainer
+    environment:
+      - BROKER_HOST=rabbitmq
+      - BROKER_USERNAME=dev
+      - BROKER_PASSWORD=dev
+      #- RABBITMQ_VHOST=/
+      #- RABBITMQ_QUEUE_NAME=dg
+      #- RABBITMQ_STREAM_NAME=dg
+  rabbitmq:
+    hostname: rabbitmq
+    image: rabbitmq:3.13.0-management
+    ports:
+      - 15672:15672
+    networks:
+      - devcontainer
+    environment:
+      - RABBITMQ_DEFAULT_USER=dev
+      - RABBITMQ_DEFAULT_PASS=dev
+    volumes:
+      - rabbitmq-data:/var/lib/rabbitmq

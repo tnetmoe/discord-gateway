@@ -1,0 +1,32 @@
+{
+    "todohighlight.exclude": [
+        "**/node_modules/**",
+        "**/bower_components/**",
+        "**/dist/**",
+        "**/build/**",
+        "**/.vscode/**",
+        "**/.vscode-test/**",
+        "**/.github/**",
+        "**/_output/**",
+        "**/*.min.*",
+        "**/*.map",
+        "**/.next/**",
+        "**/target/**"
+    ],
+    "todohighlight.include": [
+        "**/*.js",
+        "**/*.jsx",
+        "**/*.ts",
+        "**/*.tsx",
+        "**/*.html",
+        "**/*.css",
+        "**/*.scss",
+        "**/*.php",
+        "**/*.rb",
+        "**/*.txt",
+        "**/*.mdown",
+        "**/*.md",
+        "**/*.rs",
+        "**/*.proto"
+    ]
+}
