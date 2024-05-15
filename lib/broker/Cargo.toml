@@ -1,0 +1,13 @@
+[package]
+name = "broker"
+description = "Broker lib."
+version = "0.1.0"
+authors = ["Tristan <tristan@tnet.moe>"]
+repository = "https://github.com/tnetmoe/discord-gateway"
+edition = "2021"
+license = "AGPL-3.0-only"
+readme = "README.md"
+
+[lints]
+workspace = true
+
