@@ -4,7 +4,7 @@ mod connection;
 mod channel;
 mod exchange;
 mod queue;
-mod consumer;
+pub mod consumer;
 mod publisher;
 use amqprs::error::Error;
 

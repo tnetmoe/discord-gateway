@@ -13,7 +13,7 @@ use log::{debug, error};
 use crate::amqp::Result;
 
 pub async fn create_channel(connection: &Connection, fail_wait_time: Option<u64>, retries: Option<u16>) -> Result<Channel> {
-    let mut retries_count = retries.unwrap();
+    let mut retries_count = retries.unwrap_or(0);
     let wait_time = fail_wait_time.unwrap_or(5);
     loop {
         match connection.open_channel(None).await {

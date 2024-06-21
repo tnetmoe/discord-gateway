@@ -1,0 +1,30 @@
+// SPDX-License-Identifier: AGPL-3.0-only
+// Protobuf schema used to serialize messages sent between the gateway and the broker.
+syntax = "proto3";
+
+package dg.gateway;
+
+message Event {
+    Gateway gateway = 1; // metadata
+    EventData event = 2; 
+}
+
+message Gateway {
+    string event_id = 1; // uuid
+    string correlation_id = 2; // to correlate the request if the gateway needs a response
+}
+
+// Docs: https://discord.com/developers/docs/topics/gateway-events#gateway-events
+message EventData {
+    EventType type = 1;
+    // Discord event data. Use bytes to avoid parsing.
+    // Docs: https://discord.com/developers/docs/topics/gateway-events#payload-structure
+    bytes data = 2;
+}
+
+enum EventType {
+    OTHER = 0;
+    WSGateway = 1;
+    VoiceGateway = 2;
+    HTTPInteraction = 3;
+}

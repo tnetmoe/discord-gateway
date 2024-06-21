@@ -14,7 +14,7 @@ use crate::amqp::Result;
 /// Create a new connection to the AMQP server.
 pub async fn create_connection(host: String, port: u16, username: String, password: String, fail_wait_time: Option<u64>, retries: Option<u16>) -> Result<Connection> {
     // Open a connection to the RabbitMQ server. Retries every 5 seconds if it fails.
-    let mut retries_count = retries.unwrap();
+    let mut retries_count = retries.unwrap_or(0);
     let wait_time = fail_wait_time.unwrap_or(5);
     loop {
         match Connection::open(&OpenConnectionArguments::new(

@@ -7,9 +7,16 @@ use amqprs::{
     Deliver,
 };
 use async_trait::async_trait;
+use log::{info, error};
+use crate::{
+    amqp::Result,
+    proto::{
+        gateway::Event,
+        deserialize_event
+    }
+};
 
-//pub type ConsumerCallback = Box<dyn FnMut(&Channel, &str, Vec<u8>) + Send>;
-pub type ConsumerCallback = fn(channel: &Channel, queue_name: String, data: Vec<u8>) -> Result<()>;
+pub type ConsumerCallback = fn(queue_name: String, event: Event) -> Result<()>;
 
 pub async fn create_consumer(channel: &Channel, queue_name: String, consumer_tag: String, callback: ConsumerCallback) -> Result<String> {
     let args = BasicConsumeArguments::new(
@@ -51,6 +58,7 @@ impl AsyncConsumer for AMQPConsumer {
             content.len()
         );
 
+        // check content type
         let content_type = _basic_properties.content_type();
         if content_type.is_none() {
             error!("Missing content type");
@@ -59,8 +67,25 @@ impl AsyncConsumer for AMQPConsumer {
             return;
         }
 
+        let event: Event = match content_type.unwrap().as_str() {
+            "application/json" => {
+                // TODO: reject message
+                //channel.basic_reject(args).await.unwrap();
+                return;
+            },
+            "application/protobuf" => {
+                deserialize_event(&content).await.unwrap()
+            },
+            _ => {
+                error!("Unsupported content type: {}", content_type.unwrap());
+                // TODO: reject message
+                //channel.basic_reject(args).await.unwrap();
+                return;
+            }
+        };
+
         // TODO: call callback, forward message as arg
-        (self.callback)(channel, deliver.routing_key().to_string(), content).unwrap();
+        (self.callback)(deliver.routing_key().to_string(), event).unwrap();
 
         // acknowledge message after callback is done and returned Ok(())
         // TODO: callback
