@@ -1,11 +1,11 @@
 // SPDX-License-Identifier: AGPL-3.0-only
 pub mod broker;
-mod connection;
 mod channel;
-mod exchange;
-mod queue;
+mod connection;
 pub mod consumer;
+mod exchange;
 mod publisher;
+mod queue;
 use amqprs::error::Error;
 
 pub type Result<T> = std::result::Result<T, Error>;

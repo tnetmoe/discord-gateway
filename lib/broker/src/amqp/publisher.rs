@@ -1,9 +1,9 @@
 // SPDX-License-Identifier: AGPL-3.0-only
+use crate::amqp::Result;
 use amqprs::{
     channel::{BasicPublishArguments, Channel},
-    BasicProperties
+    BasicProperties,
 };
-use crate::amqp::Result;
 
 pub struct MessageOptions {
     pub routing_key: String,
@@ -17,7 +17,7 @@ pub struct MessageOptions {
     pub timestamp: Option<u64>,
     pub message_type: Option<String>,
     pub app_id: Option<String>,
-    pub cluster_id: Option<String>
+    pub cluster_id: Option<String>,
 }
 
 /// Publish a message.
@@ -25,7 +25,7 @@ pub async fn publish_message(
     channel: &Channel,
     exchange_name: String,
     options: MessageOptions,
-    data: Vec<u8>
+    data: Vec<u8>,
 ) -> Result<()> {
     let args = BasicPublishArguments::default()
         .exchange(exchange_name)

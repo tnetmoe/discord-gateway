@@ -1,22 +1,19 @@
-use amqprs::{
-    channel::Channel,
-    connection::Connection,
-};
-use log::{error, debug};
 use crate::amqp::{
-    Result,
-    connection::create_connection,
     channel::create_channel,
-    publisher::{MessageOptions, publish_message},
-    consumer::{ConsumerCallback, create_consumer},
+    connection::create_connection,
+    consumer::{create_consumer, ConsumerCallback},
     exchange::create_exchange,
-    queue::{create_queue, bind_queue}
+    publisher::{publish_message, MessageOptions},
+    queue::{bind_queue, create_queue},
+    Result,
 };
+use amqprs::{channel::Channel, connection::Connection};
+use log::{debug, error};
 
 pub struct Broker {
     options: RabbitMQBrokerOptions,
     connection: Connection,
-    channel: Channel
+    channel: Channel,
 }
 
 #[derive(Clone)]
@@ -42,8 +39,10 @@ impl Broker {
             options.username.clone(),
             options.password.clone(),
             None,
-            None
-        ).await.unwrap();
+            None,
+        )
+        .await
+        .unwrap();
 
         // Create new channel.
         let channel = create_channel(&connection, None, None).await.unwrap();
@@ -56,7 +55,7 @@ impl Broker {
                 return Err(anyhow::anyhow!("Failed to declare exchange: {}", err));
             }
         };
-        
+
         // Create queue.
         let _ = create_queue(&channel, &options.queue_name).await;
 
@@ -66,14 +65,16 @@ impl Broker {
             &channel,
             options.queue_name.clone(),
             options.exchange_name.clone(),
-            options.routing_key.clone()
-        ).await.unwrap();
+            options.routing_key.clone(),
+        )
+        .await
+        .unwrap();
         debug!("Connected to exchange: {}", options.exchange_name);
 
         Ok(Self {
             options: options.clone(),
             connection,
-            channel
+            channel,
         })
     }
 
@@ -83,26 +84,28 @@ impl Broker {
     }
 
     /// Publish a (single) message to the broker.
-    pub async fn send(
-        &mut self,
-        options: MessageOptions,
-        data: Vec<u8>,
-    ) -> Result<()> {
+    pub async fn send(&mut self, options: MessageOptions, data: Vec<u8>) -> Result<()> {
         publish_message(
             &self.channel,
             self.options.exchange_name.clone(),
             options,
-            data
-        ).await
+            data,
+        )
+        .await
     }
 
     /// Listen for messages from the broker.
-    pub async fn listen(&mut self, consumer_tag: String, consumer_callback: ConsumerCallback) -> Result<String> {
+    pub async fn listen(
+        &mut self,
+        consumer_tag: String,
+        consumer_callback: ConsumerCallback,
+    ) -> Result<String> {
         create_consumer(
             &self.channel,
             self.options.queue_name.clone(),
             consumer_tag,
-            consumer_callback
-        ).await
+            consumer_callback,
+        )
+        .await
     }
 }
